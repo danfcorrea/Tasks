@@ -30,6 +30,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         binding.textRegister.setOnClickListener(this)
 
         viewModel.verifyLoggedUser()
+        viewModel.downloadPriorities()
 
         // Observadores
         observe()

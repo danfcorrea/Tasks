@@ -7,14 +7,17 @@ import androidx.lifecycle.MutableLiveData
 import com.devmasterteam.tasks.service.constants.TaskConstants
 import com.devmasterteam.tasks.service.listener.APIListener
 import com.devmasterteam.tasks.service.model.PersonModel
+import com.devmasterteam.tasks.service.model.PriorityModel
 import com.devmasterteam.tasks.service.model.ValidationModel
 import com.devmasterteam.tasks.service.repository.PersonRepository
+import com.devmasterteam.tasks.service.repository.PriorityRepository
 import com.devmasterteam.tasks.service.repository.SecurityPreferences
 import com.devmasterteam.tasks.service.repository.remote.RetrofitClient
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     private val personRepository = PersonRepository(application.applicationContext)
+    private val priorityRepository = PriorityRepository(application.applicationContext)
     private val securityPreferences = SecurityPreferences(application.applicationContext)
 
     private val _login = MutableLiveData<ValidationModel>()
@@ -54,6 +57,18 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         RetrofitClient.addHeaders(token, personKey)
 
         _loggedUser.value = (token.isNotEmpty() && personKey.isNotEmpty())
+    }
+
+    fun downloadPriorities(){
+        priorityRepository.list(object : APIListener<List<PriorityModel>> {
+            override fun onSuccess(result: List<PriorityModel>) {
+                priorityRepository.save(result)
+            }
+
+            override fun onFailure(message: String) {
+            }
+
+        })
     }
 
 }
