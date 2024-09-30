@@ -2,6 +2,7 @@ package com.danfcorrea.tasks.view.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.danfcorrea.tasks.databinding.RowTaskListBinding
 import com.danfcorrea.tasks.service.listener.TaskListener
@@ -27,8 +28,28 @@ class TaskAdapter : RecyclerView.Adapter<TaskViewHolder>() {
         return listTasks.count()
     }
 
+    fun updateTasks(list: List<TaskModel>) {
+        val diffCallback = TaskDiffCallback(listTasks, list)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+        listTasks = list
+        diffResult.dispatchUpdatesTo(this)
+    }
+
     fun attachListener(taskListener: TaskListener) {
         listener = taskListener
     }
 
+}
+
+class TaskDiffCallback(
+    private val oldList: List<TaskModel>,
+    private val newList: List<TaskModel>
+) : DiffUtil.Callback() {
+
+    override fun getOldListSize(): Int = oldList.size
+    override fun getNewListSize(): Int = newList.size
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+        oldList[oldItemPosition].id == newList[newItemPosition].id
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+        oldList[oldItemPosition] == newList[newItemPosition]
 }
